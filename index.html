@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduVerse - Platform Pembelajaran Interaktif</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --secondary: #8b5cf6;
+            --accent: #ec4899;
+            --dark: #0f172a;
+            --light: #f8fafc;
+            --success: #10b981;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--dark);
+            color: var(--light);
+            overflow-x: hidden;
+        }
+
+        .bg-gradient {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.15) 0%, transparent 50%),
+                        radial-gradient(circle at 40% 90%, rgba(236, 72, 153, 0.1) 0%, transparent 50%);
+            z-index: -1;
+        }
+
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 1.5rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--light);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            transition: width 0.3s;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .menu-toggle {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+        }
+
+        .menu-toggle span {
+            width: 25px;
+            height: 3px;
+            background: var(--light);
+            transition: all 0.3s;
+        }
+
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8rem 5% 4rem;
+            position: relative;
+        }
+
+        .hero-content {
+            max-width: 1200px;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 6vw, 5rem);
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #fff, var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .hero p {
+            font-size: clamp(1.1rem, 2vw, 1.4rem);
+            margin-bottom: 3rem;
+            color: rgba(248, 250, 252, 0.8);
+            animation: fadeInUp 1s ease-out 0.2s backwards;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        section {
+            padding: 6rem 5%;
+            position: relative;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: clamp(2rem, 4vw, 3rem);
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--light), var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            color: rgba(248, 250, 252, 0.7);
+            margin-bottom: 4rem;
+            font-size: 1.1rem;
+        }
+
+        .lessons-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            align-items: start;
+        }
+
+        .lesson-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2.5rem;
+            transition: all 0.4s;
+            backdrop-filter: blur(10px);
+            cursor: pointer;
+            height: fit-content;
+        }
+
+        .lesson-card.active {
+            grid-row: span 2;
+        }
+
+        .lesson-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 40px rgba(99, 102, 241, 0.3);
+        }
+
+        .lesson-icon {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .lesson-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--light);
+        }
+
+        .lesson-card p {
+            color: rgba(248, 250, 252, 0.7);
+            line-height: 1.8;
+            margin-bottom: 1rem;
+        }
+
+        .lesson-content {
+            background: rgba(99, 102, 241, 0.1);
+            border-left: 3px solid var(--primary);
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .lesson-card.active .lesson-content {
+            display: block;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .lesson-content ul {
+            margin-left: 1.5rem;
+            line-height: 2;
+        }
+
+        .lesson-content ul li {
+            margin-bottom: 0.8rem;
+        }
+
+        .lesson-content strong {
+            color: var(--primary);
+        }
+
+        .code-example {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            overflow-x: auto;
+        }
+
+        .code-example code {
+            color: #f472b6;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .interactive-section {
+            background: rgba(255, 255, 255, 0.02);
+            padding: 6rem 5%;
+        }
+
+        .quiz-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 3rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .quiz-question {
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+            color: var(--light);
+        }
+
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .quiz-option {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1.1rem;
+        }
+
+        .quiz-option:hover {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .quiz-option.correct {
+            border-color: var(--success);
+            background: rgba(16, 185, 129, 0.2);
+        }
+
+        .quiz-option.wrong {
+            border-color: #ef4444;
+            background: rgba(239, 68, 68, 0.2);
+        }
+
+        .quiz-feedback {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            border-radius: 15px;
+            display: none;
+        }
+
+        .quiz-feedback.show {
+            display: block;
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        .quiz-feedback.correct {
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid var(--success);
+        }
+
+        .quiz-feedback.wrong {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid #ef4444;
+        }
+
+        .btn {
+            padding: 1rem 2.5rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 2rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.5);
+        }
+
+        .resources {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .resources-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .resource-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 2rem;
+            transition: all 0.3s;
+        }
+
+        .resource-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent);
+        }
+
+        .resource-card h4 {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            color: var(--accent);
+        }
+
+        .resource-card ul {
+            list-style: none;
+        }
+
+        .resource-card li {
+            padding: 0.8rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            color: rgba(248, 250, 252, 0.8);
+        }
+
+        .resource-card li:last-child {
+            border-bottom: none;
+        }
+
+        .tip-box {
+            background: linear-gradient(135deg, rgba(236, 72, 153, 0.1), rgba(99, 102, 241, 0.1));
+            border-left: 4px solid var(--accent);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin: 2rem 0;
+        }
+
+        .tip-box strong {
+            color: var(--accent);
+            font-size: 1.1rem;
+        }
+
+        footer {
+            padding: 3rem 5%;
+            text-align: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(15, 23, 42, 0.8);
+        }
+
+        footer p {
+            color: rgba(248, 250, 252, 0.6);
+        }
+
+        @media (max-width: 768px) {
+            .menu-toggle {
+                display: flex;
+            }
+
+            .nav-links {
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background: rgba(15, 23, 42, 0.98);
+                flex-direction: column;
+                padding: 2rem 5%;
+                gap: 1.5rem;
+                transform: translateX(-100%);
+                transition: transform 0.3s;
+            }
+
+            .nav-links.active {
+                transform: translateX(0);
+            }
+
+            .quiz-container {
+                padding: 2rem 1.5rem;
+            }
+
+            .lessons-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-gradient"></div>
+
+    <nav>
+        <div class="logo">EduAmbiya</div>
+        <ul class="nav-links">
+            <li><a href="#home">Beranda</a></li>
+            <li><a href="#lessons">Pelajaran</a></li>
+            <li><a href="#quiz">Kuis</a></li>
+            <li><a href="#resources">Sumber Belajar</a></li>
+        </ul>
+        <div class="menu-toggle" onclick="toggleMenu()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </nav>
+
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <h1>Belajar dengan Cara yang Menyenangkan</h1>
+            <p>Jelajahi berbagai topik pembelajaran interaktif yang dirancang untuk meningkatkan pengetahuan dan keterampilan Anda</p>
+        </div>
+    </section>
+
+    <section id="lessons">
+        <h2 class="section-title">Materi Pembelajaran</h2>
+        <p class="section-subtitle">Klik pada kartu untuk membuka detail pembelajaran</p>
+        
+        <div class="lessons-grid">
+            <div class="lesson-card" onclick="toggleLesson(this)">
+                <div class="lesson-icon">💻</div>
+                <h3>Dasar Pemrograman Web</h3>
+                <p>Pelajari fondasi pengembangan web dari HTML, CSS, hingga JavaScript</p>
+                <div class="lesson-content">
+                    <p><strong>Apa yang akan Anda pelajari:</strong></p>
+                    <ul>
+                        <li><strong>HTML (HyperText Markup Language):</strong> Struktur dasar halaman web menggunakan tag seperti &lt;div&gt;, &lt;p&gt;, &lt;h1&gt;, dan semantic HTML5</li>
+                        <li><strong>CSS (Cascading Style Sheets):</strong> Styling dengan selectors, flexbox, grid, dan responsive design</li>
+                        <li><strong>JavaScript:</strong> Variabel, functions, DOM manipulation, dan event handling</li>
+                        <li><strong>Best Practices:</strong> Clean code, accessibility, dan SEO optimization</li>
+                    </ul>
+                    <div class="code-example">
+                        <code>// Contoh JavaScript sederhana<br>
+const greeting = "Hello, World!";<br>
+console.log(greeting);<br><br>
+function tambah(a, b) {<br>
+&nbsp;&nbsp;return a + b;<br>
+}</code>
+                    </div>
+                    <div class="tip-box">
+                        <strong>💡 Tips Pro:</strong> Praktek coding setiap hari minimal 30 menit untuk membangun muscle memory!
+                    </div>
+                </div>
+            </div>
+
+            <div class="lesson-card" onclick="toggleLesson(this)">
+                <div class="lesson-icon">🎨</div>
+                <h3>Prinsip Desain UI/UX</h3>
+                <p>Ciptakan antarmuka yang indah dan mudah digunakan</p>
+                <div class="lesson-content">
+                    <p><strong>Konsep Penting dalam Desain:</strong></p>
+                    <ul>
+                        <li><strong>Hirarki Visual:</strong> Gunakan ukuran, warna, dan kontras untuk memandu perhatian user</li>
+                        <li><strong>White Space:</strong> Ruang kosong membuat desain lebih breathable dan mudah dibaca</li>
+                        <li><strong>Konsistensi:</strong> Gunakan pattern yang sama untuk elemen serupa di seluruh aplikasi</li>
+                        <li><strong>Typography:</strong> Pilih font yang readable, maksimal 2-3 jenis font dalam satu desain</li>
+                        <li><strong>Color Theory:</strong> Pahami psikologi warna dan gunakan palette yang harmonis</li>
+                        <li><strong>User Flow:</strong> Buat perjalanan user yang intuitif dan efisien</li>
+                    </ul>
+                    <div class="tip-box">
+                        <strong>💡 Tips Pro:</strong> Pelajari desain favorit Anda dan analisa mengapa mereka bekerja dengan baik!
+                    </div>
+                </div>
+            </div>
+
+            <div class="lesson-card" onclick="toggleLesson(this)">
+                <div class="lesson-icon">📊</div>
+                <h3>Analisis Data untuk Pemula</h3>
+                <p>Ubah data menjadi insight yang berguna</p>
+                <div class="lesson-content">
+                    <p><strong>Langkah-langkah Analisis Data:</strong></p>
+                    <ul>
+                        <li><strong>Data Collection:</strong> Kumpulkan data dari berbagai sumber (surveys, databases, APIs)</li>
+                        <li><strong>Data Cleaning:</strong> Hapus duplikat, handle missing values, dan standardisasi format</li>
+                        <li><strong>Exploratory Analysis:</strong> Gunakan statistik deskriptif dan visualisasi untuk memahami pola</li>
+                        <li><strong>Statistical Testing:</strong> Validasi hipotesis dengan t-test, chi-square, atau regression</li>
+                        <li><strong>Data Visualization:</strong> Buat chart dan dashboard yang komunikatif (bar, line, scatter plots)</li>
+                        <li><strong>Insight Generation:</strong> Tarik kesimpulan actionable dari temuan Anda</li>
+                    </ul>
+                    <div class="tip-box">
+                        <strong>💡 Tips Pro:</strong> Mulai dengan tools seperti Excel atau Google Sheets sebelum belajar Python/R!
+                    </div>
+                </div>
+            </div>
+
+            <div class="lesson-card" onclick="toggleLesson(this)">
+                <div class="lesson-icon">🚀</div>
+                <h3>Produktivitas & Time Management</h3>
+                <p>Kelola waktu dan tingkatkan efisiensi kerja Anda</p>
+                <div class="lesson-content">
+                    <p><strong>Teknik Produktivitas Terbukti:</strong></p>
+                    <ul>
+                        <li><strong>Pomodoro Technique:</strong> Kerja fokus 25 menit, istirahat 5 menit, repeat</li>
+                        <li><strong>Eisenhower Matrix:</strong> Prioritas task berdasarkan urgent vs important</li>
+                        <li><strong>Time Blocking:</strong> Alokasikan blok waktu spesifik untuk berbagai aktivitas</li>
+                        <li><strong>2-Minute Rule:</strong> Jika task bisa selesai dalam 2 menit, lakukan sekarang</li>
+                        <li><strong>Deep Work:</strong> Dedikasikan waktu tanpa gangguan untuk pekerjaan kompleks</li>
+                        <li><strong>Batching:</strong> Kelompokkan task serupa untuk efisiensi maksimal</li>
+                    </ul>
+                    <div class="tip-box">
+                        <strong>💡 Tips Pro:</strong> Identifikasi peak performance time Anda dan jadwalkan task penting di waktu tersebut!
+                    </div>
+                </div>
+            </div>
+
+            <div class="lesson-card" onclick="toggleLesson(this)">
+                <div class="lesson-icon">🧠</div>
+                <h3>Critical Thinking & Problem Solving</h3>
+                <p>Kembangkan kemampuan berpikir kritis dan analitis</p>
+                <div class="lesson-content">
+                    <p><strong>Framework Berpikir Kritis:</strong></p>
+                    <ul>
+                        <li><strong>Identifikasi Masalah:</strong> Definisikan masalah dengan jelas dan spesifik</li>
+                        <li><strong>Gather Information:</strong> Kumpulkan data dan perspektif dari berbagai sumber</li>
+                        <li><strong>Analisis Asumsi:</strong> Pertanyakan asumsi yang mendasari argumen</li>
+                        <li><strong>Consider Alternatives:</strong> Explore berbagai solusi dan konsekuensinya</li>
+                        <li><strong>Logical Reasoning:</strong> Gunakan deductive dan inductive reasoning</li>
+                        <li><strong>Evaluate Evidence:</strong> Bedakan antara fakta, opini, dan bias</li>
+                    </ul>
+                    <div class="tip-box">
+                        <strong>💡 Tips Pro:</strong> Biasakan bertanya "Mengapa?" setidaknya 5 kali untuk menggali akar masalah!
+                    </div>
+                </div>
+            </div>
+
+            <div class="lesson-card" onclick="toggleLesson(this)">
+                <div class="lesson-icon">💬</div>
+                <h3>Komunikasi Efektif</h3>
+                <p>Master seni berkomunikasi dengan jelas dan persuasif</p>
+                <div class="lesson-content">
+                    <p><strong>Prinsip Komunikasi yang Powerful:</strong></p>
+                    <ul>
+                        <li><strong>Active Listening:</strong> Dengarkan untuk memahami, bukan untuk merespons</li>
+                        <li><strong>Clear & Concise:</strong> Sampaikan pesan dengan singkat dan to the point</li>
+                        <li><strong>Body Language:</strong> 70% komunikasi adalah non-verbal (postur, kontak mata)</li>
+                        <li><strong>Empathy:</strong> Pahami perspektif dan emosi lawan bicara</li>
+                        <li><strong>Storytelling:</strong> Gunakan cerita untuk membuat pesan lebih memorable</li>
+                        <li><strong>Feedback Loop:</strong> Pastikan pesan diterima dengan benar melalui konfirmasi</li>
+                    </ul>
+                    <div class="tip-box">
+                        <strong>💡 Tips Pro:</strong> Record diri Anda saat presentasi untuk evaluasi dan improvement!
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="interactive-section" id="quiz">
+        <h2 class="section-title">Uji Pemahaman Anda</h2>
+        <p class="section-subtitle">Jawab pertanyaan berikut untuk menguji pengetahuan Anda</p>
+        
+        <div class="quiz-container">
+            <div class="quiz-question" id="question">
+                Apa yang dimaksud dengan HTML?
+            </div>
+            <div class="quiz-options" id="options">
+                <div class="quiz-option" onclick="checkAnswer(this, false)">
+                    High Tech Modern Language
+                </div>
+                <div class="quiz-option" onclick="checkAnswer(this, true)">
+                    HyperText Markup Language
+                </div>
+                <div class="quiz-option" onclick="checkAnswer(this, false)">
+                    Home Tool Markup Language
+                </div>
+                <div class="quiz-option" onclick="checkAnswer(this, false)">
+                    Hyper Transfer Markup Language
+                </div>
+            </div>
+            <div class="quiz-feedback" id="feedback"></div>
+            <button class="btn btn-primary" onclick="nextQuestion()" style="display:none;" id="nextBtn">Pertanyaan Berikutnya</button>
+        </div>
+    </section>
+
+    <section class="resources" id="resources">
+        <h2 class="section-title">Sumber Belajar Tambahan</h2>
+        <p class="section-subtitle">Resources gratis untuk memperdalam pengetahuan Anda</p>
+        
+        <div class="resources-grid">
+            <div class="resource-card">
+                <h4>📚 Platform Belajar Gratis</h4>
+                <ul>
+                    <li>FreeCodeCamp - Coding interaktif</li>
+                    <li>Coursera - Kursus dari universitas top</li>
+                    <li>Khan Academy - Matematika & Science</li>
+                    <li>MDN Web Docs - Dokumentasi web development</li>
+                    <li>YouTube Edu Channels - Video pembelajaran</li>
+                </ul>
+            </div>
+            <div class="resource-card">
+                <h4>🛠️ Tools & Software</h4>
+                <ul>
+                    <li>VS Code - Code editor terbaik</li>
+                    <li>Figma - Design tool gratis</li>
+                    <li>Git & GitHub - Version control</li>
+                    <li>Notion - Organizer & notes</li>
+                    <li>Canva - Graphic design</li>
+                </ul>
+            </div>
+            <div class="resource-card">
+                <h4>📖 Buku Rekomendasi</h4>
+                <ul>
+                    <li>Clean Code - Robert C. Martin</li>
+                    <li>Don't Make Me Think - Steve Krug</li>
+                    <li>Atomic Habits - James Clear</li>
+                    <li>Deep Work - Cal Newport</li>
+                    <li>The Pragmatic Programmer</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2025 EduVerse. Platform Pembelajaran Interaktif untuk Semua.</p>
+    </footer>
+
+    <script>
+        // Function untuk menu toggle di mobile
+        function toggleMenu() {
+            const navLinks = document.querySelector('.nav-links');
+            navLinks.classList.toggle('active');
+        }
+
+        // Event listener untuk menutup menu setelah klik link
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', () => {
+                document.querySelector('.nav-links').classList.remove('active');
+            });
+        });
+
+
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Function untuk toggle lesson card
+        function toggleLesson(card) {
+            const wasActive = card.classList.contains('active');
+            document.querySelectorAll('.lesson-card').forEach(c => c.classList.remove('active'));
+            if (!wasActive) {
+                card.classList.add('active');
+            }
+        }
+
+        // Quiz data
+        const quizData = [
+            {
+                question: "Apa yang dimaksud dengan HTML?",
+                options: [
+                    "High Tech Modern Language",
+                    "HyperText Markup Language",
+                    "Home Tool Markup Language",
+                    "Hyper Transfer Markup Language"
+                ],
+                correct: 1,
+                explanation: "HTML adalah singkatan dari HyperText Markup Language, bahasa standar untuk membuat struktur halaman web."
+            },
+            {
+                question: "Apa fungsi utama CSS dalam web development?",
+                options: [
+                    "Mengelola database",
+                    "Styling dan layout halaman web",
+                    "Membuat logika program",
+                    "Mengatur server"
+                ],
+                correct: 1,
+                explanation: "CSS (Cascading Style Sheets) digunakan untuk styling visual dan mengatur layout halaman web."
+            },
+            {
+                question: "Apa prinsip utama dalam UX Design?",
+                options: [
+                    "Membuat tampilan secantik mungkin",
+                    "User-centered design",
+                    "Menggunakan banyak animasi",
+                    "Copy desain populer"
+                ],
+                correct: 1,
+                explanation: "UX Design berfokus pada user-centered design, yaitu memahami dan memenuhi kebutuhan pengguna."
+            }
+        ];
+
+        let currentQuiz = 0;
+        let answered = false;
+
+        // Function untuk mengecek jawaban quiz
+        function checkAnswer(element, isCorrect) {
+            if (answered) return;
+            answered = true;
+
+            const options = document.querySelectorAll('.quiz-option');
+            const feedback = document.getElementById('feedback');
+            const nextBtn = document.getElementById('nextBtn');
+
+            options.forEach(opt => opt.style.pointerEvents = 'none');
+
+            if (isCorrect) {
+                element.classList.add('correct');
+                feedback.className = 'quiz-feedback show correct';
+                feedback.innerHTML = `<strong>✅ Benar!</strong> ${quizData[currentQuiz].explanation}`;
+            } else {
+                element.classList.add('wrong');
+                feedback.className = 'quiz-feedback show wrong';
+                feedback.innerHTML = `<strong>❌ Salah.</strong> Coba lagi.`;
+            }
+
+            nextBtn.style.display = 'block';
+        }
+
+
+        function nextQuestion() {
+            currentQuiz++;
+            if (currentQuiz < quizData.length) {
+                answered = false;
+                const questionEl = document.getElementById('question');
+                const optionsEl = document.getElementById('options');
+                const feedback = document.getElementById('feedback');
+                const nextBtn = document.getElementById('nextBtn');
+
+                questionEl.textContent = quizData[currentQuiz].question;
+                optionsEl.innerHTML = '';
+                quizData[currentQuiz].options.forEach((option, index) => {
+                    optionsEl.innerHTML += `
+                        <div class="quiz-option" onclick="checkAnswer(this, ${index === quizData[currentQuiz].correct})">
+                            ${option}
+                        </div>
+                    `;
+                });
+
+                feedback.className = 'quiz-feedback';
+                feedback.innerHTML = '';
+                nextBtn.style.display = 'none';
+
+                document.querySelectorAll('.quiz-option').forEach(opt => {
+                    opt.classList.remove('correct', 'wrong');
+                    opt.style.pointerEvents = 'auto';
+                });
+            } else {
+                const quizContainer = document.querySelector('.quiz-container');
+                quizContainer.innerHTML = `
+                    <h2 style="text-align: center; color: var(--success);">🎉 Selamat!</h2>
+                    <p style="text-align: center; margin: 2rem 0;">Anda telah menyelesaikan semua pertanyaan.</p>
+                    <button class="btn btn-primary" onclick="location.reload()">Mulai Kembali</button>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>
